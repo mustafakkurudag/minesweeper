@@ -5,11 +5,13 @@ public class Minesweeper {
     int row;
     int col;
     int mineNumber;
+    int rights;
     
     Minesweeper(int row, int col) {
         this.row = row;
         this.col = col;
         this.mineNumber = (row * col) / 4;
+        this.rights = (row * col) - this.mineNumber;
     }
 
     void game() {
@@ -18,7 +20,15 @@ public class Minesweeper {
             Arrays.fill(c, '-');
 
         for (int i = 0; i < mineField.length; i++) {
-            int mineLocation = (int) (Math.random() * row);
+            int mineLocation;
+
+            while(true) {
+                mineLocation = (int) (Math.random() * row);
+
+                if (mineLocation < col) {
+                    break;
+                }
+            }
 
             for (int j = 0; j < mineField[i].length; j++) {
                 if (mineField[i][mineLocation] != '*') {
@@ -29,8 +39,8 @@ public class Minesweeper {
                 }
             }
         }
-        printField(mineField);
 
+        printMinelessField(mineField);
         chooseLocation(mineField);
     }
 
@@ -47,20 +57,15 @@ public class Minesweeper {
 
             if (mineField[row][col] == '*') {
                 System.out.println("You loose the game... :(");
+                printField(mineField);
                 break;
             } else {
-                for (int i = 0; i < mineField.length; i++) {
-                    for (int j = 0; j < mineField[0].length; j++) {
-                        if (mineField[i][col] == '*' || mineField[row][j] == '*') {
-                            if (Math.abs(i - row) == 1) {
-                                mineField[i][j] = '1';
-                            }
+                winTheGame(row, col, mineField);
 
-                            if (Math.abs(j - col) == 1) {
-                                mineField[i][j] = '1';
-                            }
-                        }
-                    }
+                this.rights--;
+                if (this.rights == 0) {
+                    System.out.println("You win the game... :)");
+                    break;
                 }
             }
         }
@@ -70,9 +75,86 @@ public class Minesweeper {
         System.out.println("=======================");
         for (char[] c: field) {
             for (char ch: c) {
-                System.out.print(ch + " ");
+                if (ch == '1' || ch == '2') {
+                    System.out.print('-' + " ");
+                } else {
+                    System.out.print(ch + " ");
+                }
             }
             System.out.println("");
         }
+    }
+
+    void printMinelessField(char[][] field) {
+        System.out.println("=======================");
+        for (char[] c: field) {
+            for (char ch: c) {
+                if (ch == '*') {
+                    System.out.print('-' + " ");
+                } else {
+                    System.out.print(ch + " ");
+                }
+            }
+            System.out.println("");
+        }
+    }
+
+    void winTheGame(int row, int col, char[][] array) {
+        if (row != 0) {
+            if (array[row - 1][col] == '*') {
+                if (array[row][col] != '1') {
+                    array[row][col] = '1';
+                } else {
+                    array[row][col]++;
+                }
+            }
+            if (row < array.length - 1) {
+                if (array[row + 1][col] == '*') {
+                    if (array[row][col] != '1') {
+                        array[row][col] = '1';
+                    } else {
+                        array[row][col]++;
+                    }
+                }
+            }
+        } else {
+            if (array[row + 1][col] == '*') {
+                if (array[row][col] != '1') {
+                    array[row][col] = '1';
+                } else {
+                    array[row][col]++;
+                }
+            }
+        }
+
+        if (col != 0) {
+            if (array[row][col - 1] == '*') {
+                if (array[row][col] != '1') {
+                    array[row][col] = '1';
+                } else {
+                    array[row][col]++;
+                }
+            }
+
+            if (col < array[row].length - 1) {
+                if (array[row][col + 1] == '*') {
+                    if (array[row][col] != '1') {
+                        array[row][col] = '1';
+                    } else {
+                        array[row][col]++;
+                    }
+                }
+            }
+        } else {
+            if (array[row][col + 1] == '*') {
+                if (array[row][col] != '1') {
+                    array[row][col] = '1';
+                } else {
+                    array[row][col]++;
+                }
+            }
+        }
+
+        printMinelessField(array);
     }
 }
